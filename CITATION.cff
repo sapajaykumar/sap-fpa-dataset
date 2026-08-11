@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+title: "A Synthetic SAP-Structured FP&A Dataset with Plan Versions"
+message: "If you use this dataset, please cite it as below."
+type: dataset
+authors:
+  - family-names: "Kumar"
+    given-names: "Ajay"
+    affiliation: "Indian Institute of Information Technology Dharwad"
+  - family-names: "Khaire"
+    given-names: "Utkarsh"
+    affiliation: "Indian Institute of Information Technology Dharwad"
+abstract: >-
+  A reproducible synthetic dataset for financial planning and analysis research,
+  combining SAP-style double-entry transactional actuals with budget and rolling
+  forecast plan versions across four fiscal years (FY2022-FY2025). 159,934 postings
+  across 79,967 documents; 22,656 planning rows; 236 cost-centre x G/L-account
+  forecasting series. Generated deterministically from seed 42 and shipped with a
+  16-check deterministic acceptance suite. No real company, client, or SAP customer
+  data were used at any stage.
+keywords:
+  - financial planning and analysis
+  - synthetic data
+  - enterprise resource planning
+  - time series forecasting
+  - benchmark dataset
+  - SAP
+license: CC-BY-4.0
+version: "1.0.0"
+date-released: "REPLACE_DATE"

@@ -1,0 +1,26 @@
+{
+  "title": "A Synthetic SAP-Structured FP&A Dataset with Plan Versions",
+  "upload_type": "dataset",
+  "description": "<p>A reproducible synthetic dataset for financial planning and analysis (FP&amp;A) research, combining SAP-style double-entry transactional actuals with budget and rolling-forecast plan versions across four fiscal years (FY2022-FY2025).</p><p>159,934 postings across 79,967 documents; 22,656 planning rows; 3 company codes, 36 cost centres, 19 G/L accounts, 48 monthly periods plus special periods 13-16; 236 cost-centre x G/L-account forecasting series. Generation is deterministic from seed 42 and ships with a 16-check acceptance suite covering integrity, realism and plan coherence.</p><p>No real company, client, or SAP customer data were used at any stage. Distributional shape parameters were calibrated against publicly available synthetic sources only.</p>",
+  "creators": [
+    {
+      "name": "Kumar, Ajay",
+      "affiliation": "Indian Institute of Information Technology Dharwad"
+    },
+    {
+      "name": "Khaire, Utkarsh",
+      "affiliation": "Indian Institute of Information Technology Dharwad"
+    }
+  ],
+  "keywords": [
+    "financial planning and analysis",
+    "synthetic data",
+    "enterprise resource planning",
+    "time series forecasting",
+    "benchmark dataset",
+    "SAP"
+  ],
+  "license": "cc-by-4.0",
+  "access_right": "open",
+  "version": "1.0.0"
+}
