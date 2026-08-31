@@ -55,13 +55,25 @@ def main(out: pathlib.Path) -> int:
           f"({act['GJAHR'].min()}-{act['GJAHR'].max()})")
 
     # Seasonality must be detectable, not merely asserted.
-    rev = regular[regular["HKONT"] == "400000"]
-    m = rev.groupby("MONAT")["DMBTR"].sum()
-    m_idx = m / m.mean()
-    amp = m_idx.max() - m_idx.min()
-    check("T2b Seasonality detectable in revenue", amp > 0.25,
-          f"monthly index range {m_idx.min():.2f}-{m_idx.max():.2f} "
-          f"(amplitude {amp:.2f}); peak month = {int(m_idx.idxmax())}")
+    # Tested on every revenue account and within every fiscal year, rather
+    # than on one account pooled across the whole span. Pooling can mask a
+    # year in which the pattern is absent, and one account says nothing about
+    # the others.
+    gl_rev = pd.read_csv(out / "dim_gl_account.csv", dtype={"HKONT": str})
+    rev_accts = gl_rev[gl_rev["CATEGORY"] == "REVENUE"]["HKONT"].tolist()
+    amps = {}
+    for acct in rev_accts:
+        for y, g in regular[regular["HKONT"] == acct].groupby("GJAHR"):
+            mm = g.groupby("MONAT")["DMBTR"].sum()
+            idx = mm / mm.mean()
+            amps[(acct, int(y))] = float(idx.max() - idx.min())
+    worst = min(amps.values()) if amps else 0.0
+    pooled = regular[regular["HKONT"] == rev_accts[0]].groupby("MONAT")["DMBTR"].sum()
+    pooled_idx = pooled / pooled.mean()
+    check("T2b Seasonality detectable in revenue", worst > 0.25,
+          f"amplitude >= {worst:.2f} in every one of {len(amps)} "
+          f"account-year combinations; peak month "
+          f"{int(pooled_idx.idxmax())} on {rev_accts[0]}")
 
     # -- INTEGRITY --------------------------------------------------------
     sgn = np.where(act["SHKZG"] == "S", 1.0, -1.0)
@@ -71,26 +83,56 @@ def main(out: pathlib.Path) -> int:
     check("I1  Every document balances (debit == credit)", n_bad == 0,
           f"{bal.size:,} documents checked, {n_bad} unbalanced")
 
+    # BELNR restarts at 100001 for each (BUKRS, GJAHR), so a bare BELNR string
+    # is not a document identifier: the same string recurs across company codes
+    # and years. Matching on the string alone conflates distinct documents and
+    # undercounts both sides. The document key is (BUKRS, GJAHR, BELNR).
+    #
+    # A reversal posts in the period FOLLOWING its accrual, so an accrual
+    # raised in December of year Y is reversed in January of Y+1 and carries
+    # GJAHR = Y+1 while its STBLG points at a document in year Y. The accrual
+    # year must therefore be recovered from the reversal's own period.
     _s = act["STBLG"].fillna("")
     accr = act[(act["BLART"] == "AB") & (_s.str.len() == 0)]
-    revs = act[_s.str.len() > 0]
-    accr_docs = set(accr["BELNR"].unique())
-    rev_targets = set(revs["STBLG"].unique())
-    orphan = accr_docs - rev_targets
-    # Accruals raised in the final period have no following period to reverse into.
-    last = act[["GJAHR", "MONAT"]].max()
-    tail = set(accr[(accr["GJAHR"] == last["GJAHR"])
-                    & (accr["MONAT"] >= 12)]["BELNR"].unique())
-    real_orphans = orphan - tail
-    check("I2  Accruals reversed via STBLG", len(real_orphans) == 0,
-          f"{len(accr_docs):,} accruals, {len(rev_targets):,} reversals, "
-          f"{len(real_orphans)} unreversed (excl. {len(orphan & tail)} in final period)")
+    revs = act[_s.str.len() > 0].copy()
+    revs["ACC_GJAHR"] = np.where(revs["MONAT"] > 1, revs["GJAHR"], revs["GJAHR"] - 1)
 
-    _k = act["KOSTL"].fillna("")
-    fk = set(_k[_k.str.len() > 0]) - set(
-        pd.read_csv(out / "dim_cost_center.csv", dtype=str)["KOSTL"])
-    check("I3  Cost-centre referential integrity", not fk,
-          f"{len(fk)} orphan KOSTL values")
+    accr_docs = set(map(tuple, accr[["BUKRS", "GJAHR", "BELNR"]]
+                        .drop_duplicates().values))
+    rev_targets = set(map(tuple, revs[["BUKRS", "ACC_GJAHR", "STBLG"]]
+                          .drop_duplicates().values))
+    orphan = accr_docs - rev_targets
+    dangling = rev_targets - accr_docs      # a reversal of nothing
+    # Accruals raised in the final fiscal year have no following period.
+    last_y = act["GJAHR"].max()
+    tail = {d for d in orphan if d[1] == last_y}
+    real_orphans = orphan - tail
+    check("I2  Accruals reversed via STBLG",
+          len(real_orphans) == 0 and len(dangling) == 0,
+          f"{len(accr_docs):,} accrual documents, "
+          f"{len(accr_docs & rev_targets):,} reversed, "
+          f"{len(real_orphans)} unreversed, {len(dangling)} dangling "
+          f"(excl. {len(tail)} raised in the final fiscal year)")
+
+    # Every dimension, not only the cost centre. The original checked KOSTL
+    # alone while the label implied the dimensional layer as a whole; an
+    # orphan G/L account or profit centre would have passed silently.
+    dims = {
+        "KOSTL": set(pd.read_csv(out / "dim_cost_center.csv", dtype=str)["KOSTL"]),
+        "HKONT": set(pd.read_csv(out / "dim_gl_account.csv",
+                                 dtype={"HKONT": str})["HKONT"]),
+        "PRCTR": set(pd.read_csv(out / "dim_profit_center.csv", dtype=str)["PRCTR"]),
+        "BUKRS": set(pd.read_csv(out / "dim_company_code.csv", dtype=str)["BUKRS"]),
+    }
+    orphans = {}
+    for col, ref in dims.items():
+        v = act[col].fillna("").astype(str)
+        bad = set(v[v.str.len() > 0]) - ref
+        if bad:
+            orphans[col] = len(bad)
+    check("I3  Dimension referential integrity", not orphans,
+          "0 orphans across KOSTL, HKONT, PRCTR, BUKRS" if not orphans
+          else f"orphans: {orphans}")
 
     late = act[pd.to_datetime(act["BLDAT"]) > act["BUDAT"]]
     check("I4  Document date <= posting date", late.empty,
@@ -105,10 +147,15 @@ def main(out: pathlib.Path) -> int:
           f"{me:.1%} of lines post in the last 3 days of the period "
           f"(uniform would be ~10%)")
 
+    # Presence alone is too weak: a single line would have satisfied it.
+    # Year-end close activity should appear in every completed fiscal year.
     sp = act[act["MONAT"] > 12]
-    check("R2  Special periods 13-16 present", not sp.empty,
-          f"{len(sp):,} lines in year-end close periods "
-          f"{sorted(sp['MONAT'].unique().tolist())}")
+    years_with_sp = sp["GJAHR"].nunique()
+    all_years = act["GJAHR"].nunique()
+    check("R2  Special periods 13-16 present",
+          (not sp.empty) and years_with_sp == all_years,
+          f"{len(sp):,} lines in periods {sorted(sp['MONAT'].unique().tolist())}, "
+          f"present in {years_with_sp}/{all_years} fiscal years")
 
     # -- CALIBRATION ------------------------------------------------------
     # Level is NOT calibrated to Schreyer (their amounts inherit PaySim's
@@ -142,17 +189,26 @@ def main(out: pathlib.Path) -> int:
          .rename("actual").reset_index())
     b = plan[plan["VERSION"] == "1"].rename(columns={"DMBTR": "budget"})
     j = a.merge(b, on=["BUKRS", "GJAHR", "MONAT", "KOSTL", "HKONT"], how="inner")
-    j["var_pct"] = (j["actual"] - j["budget"]) / j["budget"]
+    # Both plan errors are expressed over the REALISED value. The earlier
+    # version divided the budget error by the budget and the forecast error by
+    # the actual, then compared the two directly. Those are different
+    # normalisations: one asks how far the outcome landed from the plan
+    # relative to the plan, the other relative to the outcome. The verdict
+    # happened to be unchanged, but the two numbers were not comparable and
+    # the check asserted a comparison between them.
+    j["var_pct"] = (j["actual"] - j["budget"]) / j["actual"]
     mape = j["var_pct"].abs().median()
     check("P1  Budget variance is non-trivial and bounded",
           0.03 < mape < 0.60,
-          f"median |actual-vs-budget| = {mape:.1%} across {len(j):,} cells")
+          f"median |actual-vs-budget| = {mape:.1%} of actual, "
+          f"across {len(j):,} cells")
 
     f = plan[plan["VERSION"] == "2"].rename(columns={"DMBTR": "forecast"})
     jf = a.merge(f, on=["BUKRS", "GJAHR", "MONAT", "KOSTL", "HKONT"], how="inner")
     fmape = ((jf["actual"] - jf["forecast"]).abs() / jf["actual"]).median()
     check("P2  Rolling forecast beats budget", fmape < mape,
-          f"forecast {fmape:.1%} vs budget {mape:.1%} median abs error")
+          f"forecast {fmape:.1%} vs budget {mape:.1%} median abs error, "
+          f"both over actual")
 
     # -- P&L COHERENCE ----------------------------------------------------
     # The defect this catches: P&L ratios held only in expectation, so revenue
