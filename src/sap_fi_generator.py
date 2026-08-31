@@ -573,6 +573,51 @@ class SAPFinanceGenerator:
         return {**dims, "acdoca_actuals": actuals, "plan_versions": plan}
 
 
+# --------------------------------------------------------------------------
+# Universal-journal view
+# --------------------------------------------------------------------------
+def to_universal_journal(act: pd.DataFrame) -> pd.DataFrame:
+    """
+    Project the generated postings onto S/4HANA ACDOCA field names.
+
+    The generator produces classic FI documents, so its native schema is
+    BKPF/BSEG: HKONT, DMBTR, SHKZG, BUZEI. The universal journal renames most
+    of those and, more importantly, changes one convention: ACDOCA carries a
+    SIGNED amount in HSL rather than an unsigned figure qualified by a
+    debit/credit indicator. DRCRK is retained, but the sign lives in the
+    amount. Consumers who aggregate HSL directly therefore get the correct
+    net figure without needing to interpret SHKZG, which is the property that
+    makes account-based reporting straightforward in S/4HANA.
+
+    This is a view, not a second generation. It is derived row-for-row from
+    the postings file and carries no independent randomness, so the two
+    artefacts cannot drift apart.
+    """
+    sign = np.where(act["SHKZG"] == "S", 1.0, -1.0)
+    out = pd.DataFrame({
+        "RLDNR":  "0L",                             # leading ledger
+        "RBUKRS": act["BUKRS"],
+        "GJAHR":  act["GJAHR"],
+        "BELNR":  act["BELNR"],
+        "DOCLN":  act["BUZEI"].astype(int).map(lambda v: f"{v:06d}"),
+        "RYEAR":  act["GJAHR"],
+        "POPER":  act["MONAT"].astype(int).map(lambda v: f"{v:03d}"),
+        "BUDAT":  act["BUDAT"],
+        "BLDAT":  act["BLDAT"],
+        "BLART":  act["BLART"],
+        "RACCT":  act["HKONT"],                     # G/L account
+        "RCNTR":  act["KOSTL"],                     # cost centre
+        "PRCTR":  act["PRCTR"],
+        "DRCRK":  act["SHKZG"],
+        "RWCUR":  act["WAERS"],
+        "HSL":    (act["DMBTR"] * sign).round(2),   # signed, company code currency
+        "WSL":    (act["WRBTR"] * sign).round(2),   # signed, transaction currency
+        "USNAM":  act["USNAM"],
+        "STBLG":  act["STBLG"],
+    })
+    return out
+
+
 if __name__ == "__main__":
     import pathlib
     import sys
@@ -585,3 +630,9 @@ if __name__ == "__main__":
     for name, df in tables.items():
         df.to_csv(out / f"{name}.csv", index=False)
         print(f"{name:26} {df.shape[0]:>9,} rows x {df.shape[1]:>2} cols")
+
+    # Derived view. Written after the primary artefact so that the postings
+    # file, and therefore its digest, is unaffected by this addition.
+    uj = to_universal_journal(tables["acdoca_actuals"])
+    uj.to_csv(out / "acdoca_universal_journal.csv", index=False)
+    print(f"{'acdoca_universal_journal':26} {uj.shape[0]:>9,} rows x {uj.shape[1]:>2} cols  (view)")
