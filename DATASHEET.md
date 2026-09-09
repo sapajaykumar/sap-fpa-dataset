@@ -174,6 +174,7 @@ modules reproduce it:
 | `src/significance.py` | Friedman, Nemenyi, Wilcoxon with Holm correction |
 | `src/metaheuristic.py` | GA, PSO, and a budget-matched random-search control |
 | `src/refit_tuned.py` | refits the selected configurations and scores FY2025 |
+| src/aggregate_eval.py | cell-level versus aggregate ranking, Spearman and Kendall correlations |
 
 **Is there anything that should NOT be used?**
 The dataset must not be used to make claims about any real organisation's finances, nor
