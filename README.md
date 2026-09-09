@@ -78,6 +78,7 @@ python src/nbeats.py ./out             # N-BEATS generic and interpretable, glob
 python src/significance.py ./out       # Friedman, Nemenyi, Wilcoxon with Holm correction
 python src/metaheuristic.py ./out 40   # GA, PSO and a budget-matched random control
 python src/refit_tuned.py ./out        # refits the winners and scores FY2025
+python src/aggregate_eval.py ./out    # cell-level vs aggregate ranking, rank correlations
 ```
 
 Deterministic methods reproduce exactly. Deep-learning results agree to within the reported
