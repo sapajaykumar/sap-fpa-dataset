@@ -58,6 +58,10 @@ python src/sap_fi_generator.py ./out     # deterministic, seed = 42
 python src/validate_dataset.py ./out     # expect: 16/16 checks passed
 ```
 
+On a machine without a GPU, install PyTorch from its CPU index first
+(`pip install torch --index-url https://download.pytorch.org/whl/cpu`); the default wheel
+pulls in about 3 GB of CUDA libraries that are not needed.
+
 Generation is deterministic. The transactional output has reproduced **byte-identically**
 on five executions across three platforms — Google Colab, Kaggle, and a separate Linux
 environment — with different operating-system images and different builds of the
@@ -65,11 +69,14 @@ underlying numerical libraries. MD5 of `acdoca_actuals.csv`:
 `95466e9fc36db89f43f4516614169c0d`.
 
 That output matches the snapshot in `data/` exactly, so every number in the accompanying
-paper is regenerable from this repository alone.
+paper is regenerable from this repository alone. The outputs of a clean-clone run on a
+Tesla T4 are kept in `data/reference_outputs/`, so any table or figure can be checked
+against a file without re-running anything.
 
 ### Benchmark modules
 
-The forecasting benchmark reported in the paper is reproduced by four further scripts:
+The forecasting benchmark reported in the paper is reproduced by eight scripts, run in
+this order:
 
 ```bash
 python src/baselines.py ./out          # naive, seasonal naive, ETS, LightGBM, Budget v1
@@ -78,12 +85,15 @@ python src/nbeats.py ./out             # N-BEATS generic and interpretable, glob
 python src/significance.py ./out       # Friedman, Nemenyi, Wilcoxon with Holm correction
 python src/metaheuristic.py ./out 40   # GA, PSO and a budget-matched random control
 python src/refit_tuned.py ./out        # refits the winners and scores FY2025
-python src/aggregate_eval.py ./out    # cell-level vs aggregate ranking, rank correlations
+python src/aggregate_eval.py ./out     # cell-level vs aggregate ranking, rank correlations
+python src/plot_search_traces.py ./out # search-trace summary and figure (needs matplotlib)
 ```
 
-Deterministic methods reproduce exactly. Deep-learning results agree to within the reported
-seed standard deviations rather than exactly, because GPU reduction orders are not
-deterministic: generic N-BEATS returns 0.964 on a Tesla T4 and 0.958 on CPU.
+Deterministic methods reproduce exactly on any platform. Deep-learning results are stable
+on a given platform (a clean clone reproduced the paper's T4 values exactly) but shift in
+the third decimal between GPU and CPU: generic N-BEATS returns 0.964 on a Tesla T4 and
+0.958 on CPU. Where models sit close together, that shift can reorder them; on CPU, generic
+N-BEATS ranks eighth rather than ninth on aggregate revenue. The paper reports T4 values.
 
 `classical_extra.py` and `metaheuristic.py` checkpoint as they run, into `out/ckpt/` and
 `out/ckpt_meta/`. Re-running resumes; delete those folders to force a clean run.
@@ -118,7 +128,11 @@ No real company, client, or SAP customer data was used at any stage.
 
 ## Citation
 
-See `CITATION.cff`. Archived at <https://doi.org/10.5281/zenodo.21888648>.
+See `CITATION.cff`. Archived on Zenodo; this DOI covers all versions and resolves to the
+latest: <https://doi.org/10.5281/zenodo.21888240>.
+
+To cite the exact release behind a result, use that release's own version DOI, listed on
+the Zenodo record.
 
 ## Licence
 

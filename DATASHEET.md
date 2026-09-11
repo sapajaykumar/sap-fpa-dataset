@@ -2,7 +2,7 @@
 
 Following the *Datasheets for Datasets* format (Gebru et al., 2021).
 
-**Version 1.1.0.** See Maintenance for changes since 1.0.
+**Version 1.1.2.** See Maintenance for changes since 1.0.
 
 ---
 
@@ -174,7 +174,11 @@ modules reproduce it:
 | `src/significance.py` | Friedman, Nemenyi, Wilcoxon with Holm correction |
 | `src/metaheuristic.py` | GA, PSO, and a budget-matched random-search control |
 | `src/refit_tuned.py` | refits the selected configurations and scores FY2025 |
-| src/aggregate_eval.py | cell-level versus aggregate ranking, Spearman and Kendall correlations |
+| `src/aggregate_eval.py` | cell-level versus aggregate ranking, Spearman and Kendall correlations |
+| `src/plot_search_traces.py` | search-trace summary and the best-so-far figure for the tuning study |
+
+The outputs of a clean-clone run on a Tesla T4 are kept in `data/reference_outputs/`, with
+a README mapping each file to the table or figure it supports.
 
 **Is there anything that should NOT be used?**
 The dataset must not be used to make claims about any real organisation's finances, nor
@@ -243,6 +247,20 @@ recovering the accrual year from the reversal's own period changes the reported 
 663 accruals / 647 reversals to 689 / 672. The verdict is unchanged — no accrual inside the
 span is unreversed — and **the generated data are unaffected**; only the check was wrong.
 The corrected check additionally tests for reversals pointing at no accrual.
+
+*Version 1.1.2.* Releases 1.0.0 to 1.1.1 did not contain `src/baselines.py` or
+`src/nbeats.py`. Five of the benchmark scripts import the first and two import the second,
+so the benchmark could not be run from a clean clone of any of those releases. Both modules
+are now included, and `nbeats.py` writes the seed-averaged forecasts that `significance.py`
+and `aggregate_eval.py` read. A clean clone of this release reproduces the reported
+benchmark on a Tesla T4.
+
+In the same release, the N-BEATS objective in `metaheuristic.py` now fixes the NumPy seed as
+well as the PyTorch seed. Minibatch order was previously unseeded, so the same configuration
+could score differently depending on how many evaluations preceded it. The hyperparameter
+search was re-run after the fix; the files in `data/reference_outputs/` come from that
+run. Only the tuning study is affected. **The generated data are unaffected**:
+`acdoca_actuals.csv` MD5 is unchanged.
 
 Three further checks were widened in the same release after the same style of review: I3
 tested only the cost centre while its label implied the dimensional layer as a whole; R2
