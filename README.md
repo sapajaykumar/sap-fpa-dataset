@@ -133,7 +133,7 @@ latest: <https://doi.org/10.5281/zenodo.21888240>.
 
 To cite the exact release behind a result, use that release's own version DOI, listed on
 the Zenodo record.
-
+The accompanying paper uses v1.1.2: https://doi.org/10.5281/zenodo.22703035.
 ## Licence
 
 Code: MIT (`LICENSE`) · Data: CC BY 4.0 (`LICENSE-DATA`).
