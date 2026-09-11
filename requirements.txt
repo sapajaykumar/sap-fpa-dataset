@@ -10,3 +10,4 @@ scipy>=1.10
 statsmodels>=0.14
 lightgbm
 torch
+matplotlib   # plot_search_traces.py (Figure 4) only
