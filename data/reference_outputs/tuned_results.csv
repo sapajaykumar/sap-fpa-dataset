@@ -1,0 +1,3 @@
+model,MASE,sd,selected_by
+LightGBM (tuned),1.034497835205271,,GA
+N-BEATS generic (tuned),0.9632730623189513,0.0038527657413988353,PSO

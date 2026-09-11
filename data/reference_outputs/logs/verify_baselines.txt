@@ -1,0 +1,33 @@
+  series 236  periods 48  train 36  horizon 12
+  origin: close of FY2024 -> forecasting FY2025
+
+  fitting...
+      ETS fell back to seasonal-naive on 3/236 series
+
+==============================================================================
+  CELL-LEVEL, FY2025 (236 cells x 12 months)                                  
+  forecast origin: FY2024 close. All models below see identical data.
+==============================================================================
+  model                        MASE     WAPE           MAE            RMSE
+  --------------------------------------------------------------------------
+  LightGBM (global)           1.034   16.6%       409,836       1,248,817
+  Budget (v1)  [human]        1.107   16.8%       412,667       1,144,313
+  ETS (Holt-Winters)          1.127   19.7%       483,779       1,607,995
+  Seasonal naive              1.133   17.2%       424,669       1,291,433
+  Naive                       2.720   36.5%       898,703       2,374,779
+  --------------------------------------------------------------------------
+  NOT RANKED -- sees within-year actuals, different information set:
+  Rolling forecast (v2)       0.960   14.6%       358,879         997,313
+==============================================================================
+
+  TOTAL REVENUE, FY2025 (EUR m) -- the number the board sees
+  model                        WAPE     MAE (EUR m)
+  -------------------------------------------------
+  Rolling forecast (v2)       3.6%            10.7
+  ETS (Holt-Winters)          3.8%            11.3
+  LightGBM (global)           4.7%            13.8
+  Budget (v1)  [human]        5.5%            16.4
+  Seasonal naive              6.4%            19.0
+  Naive                      27.8%            82.6
+
+  written: out/baseline_results.csv

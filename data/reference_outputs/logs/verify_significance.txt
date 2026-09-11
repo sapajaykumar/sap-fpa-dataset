@@ -1,0 +1,76 @@
+      ETS fell back to seasonal-naive on 3/236 series
+==============================================================================
+  SIGNIFICANCE TESTING -- cell-level MASE, FY2025
+==============================================================================
+  11 models x 236 paired cells
+  rolling forecast (v2) excluded: different information set
+
+  Friedman chi2 = 392.90, p = 3.051e-78
+  Significant at alpha = 0.05: at least one model differs.
+
+  Mean rank (lower is better):
+    NBEATS-G (generic)            4.225
+    GlobalMLP (+embeddings)       4.428
+    NBEATS-I (interpretable)      4.504
+    Theta                         5.208
+    LightGBM (global)             5.445
+    ETS (Holt-Winters)            5.854
+    Budget (v1)                   6.339
+    SARIMA                        7.106
+    Seasonal naive                7.286
+    STL+ETS                       7.775
+    Naive                         7.831
+
+  Nemenyi critical difference = 0.983
+  Two models differ significantly if their mean ranks differ by more.
+
+  Against the best-ranked model (NBEATS-G (generic)):
+    GlobalMLP (+embeddings)     delta rank  0.203   NOT distinguishable
+    NBEATS-I (interpretable)    delta rank  0.280   NOT distinguishable
+    Theta                       delta rank  0.983   significantly worse
+    LightGBM (global)           delta rank  1.220   significantly worse
+    ETS (Holt-Winters)          delta rank  1.629   significantly worse
+    Budget (v1)                 delta rank  2.114   significantly worse
+    SARIMA                      delta rank  2.881   significantly worse
+    Seasonal naive              delta rank  3.061   significantly worse
+    STL+ETS                     delta rank  3.551   significantly worse
+    Naive                       delta rank  3.606   significantly worse
+
+==============================================================================
+  PAIRWISE WILCOXON -- the comparisons the paper claims
+==============================================================================
+  comparison                                            p (Holm)    
+  ------------------------------------------------------------------------
+  NBEATS-G (generic) vs LightGBM (global)       0.0000 *
+      mean MASE 0.961 vs 1.034  -> NBEATS-G (generic) lower
+  NBEATS-G (generic) vs Theta                   0.0002 *
+      mean MASE 0.961 vs 1.054  -> NBEATS-G (generic) lower
+  NBEATS-G (generic) vs Budget (v1)             0.0000 *
+      mean MASE 0.961 vs 1.107  -> NBEATS-G (generic) lower
+  NBEATS-G (generic) vs NBEATS-I (interpretable)    0.4391  
+      mean MASE 0.961 vs 1.053  -> NBEATS-G (generic) lower
+  LightGBM (global) vs Theta                   0.7124  
+      mean MASE 1.034 vs 1.054  -> LightGBM (global) lower
+  LightGBM (global) vs Budget (v1)             0.0134 *
+      mean MASE 1.034 vs 1.107  -> LightGBM (global) lower
+  ------------------------------------------------------------------------
+  * significant at alpha = 0.05 after Holm correction across 6 comparisons
+
+==============================================================================
+  CONFINED DEFICIT -- generic vs interpretable N-BEATS, by category
+==============================================================================
+  category         cells   NBEATS-G   NBEATS-I   p (Holm)
+  ------------------------------------------------------------
+  COGS                20      0.987      1.004     0.6598  
+  DEPRECIATION        26      0.933      0.939     1.0000  
+  OPEX                90      0.966      0.960     1.0000  
+  PERSONNEL           80      0.943      1.218     0.2722  
+  REVENUE             20      1.017      1.013     1.0000  
+  ------------------------------------------------------------
+  * significant at alpha = 0.05 after Holm correction across 5 categories
+
+  Read with the aggregate result above: if personnel is the only
+  significant category, the claim is that the deficit is CONFINED,
+  not that the interpretable variant is worse overall.
+
+  written: out/significance_ranks.csv

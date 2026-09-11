@@ -1,0 +1,63 @@
+  series 236  train 36  horizon 12
+  origin: close of FY2024 -> forecasting FY2025
+  checkpoints: out/ckpt  (delete to force a clean run)
+
+  fitting...
+      Theta: 25/236 series
+      Theta: 50/236 series
+      Theta: 75/236 series
+      Theta: 100/236 series
+      Theta: 125/236 series
+      Theta: 150/236 series
+      Theta: 175/236 series
+      Theta: 200/236 series
+      Theta: 225/236 series
+      STL+ETS: 25/236 series
+      STL+ETS: 50/236 series
+      STL+ETS: 75/236 series
+      STL+ETS: 100/236 series
+      STL+ETS: 125/236 series
+      STL+ETS: 150/236 series
+      STL+ETS: 175/236 series
+      STL+ETS: 200/236 series
+      STL+ETS: 225/236 series
+      SARIMA: 25/236 series
+      SARIMA: 50/236 series
+      SARIMA: 75/236 series
+      SARIMA: 100/236 series
+      SARIMA: 125/236 series
+      SARIMA: 150/236 series
+      SARIMA: 175/236 series
+      SARIMA: 200/236 series
+      SARIMA: 225/236 series
+
+==============================================================================
+  CELL-LEVEL, FY2025 -- FULL CLASSICAL FIELD                                  
+  forecast origin: FY2024 close. All models below see identical data.
+==============================================================================
+  model                        MASE     WAPE           MAE            RMSE
+  --------------------------------------------------------------------------
+  LightGBM (global)           1.034   16.6%       409,836       1,248,817
+  Theta                       1.054   19.2%       472,078       1,402,938
+  Budget (v1)  [human]        1.107   16.8%       412,667       1,144,313
+  SARIMA                      1.125   17.3%       426,327       1,290,263
+  ETS (Holt-Winters)          1.127   19.7%       483,779       1,607,995
+  Seasonal naive              1.133   17.2%       424,669       1,291,433
+  STL+ETS                     1.223   20.3%       499,981       1,626,257
+  Naive                       2.720   36.5%       898,703       2,374,779
+  --------------------------------------------------------------------------
+  NOT RANKED -- sees within-year actuals:
+  Rolling forecast (v2)       0.960   14.6%       358,879         997,313
+==============================================================================
+
+  Seasonal-naive fallbacks (report these in the paper):
+    Theta        0/236
+    STL+ETS      0/236
+    SARIMA       0/236
+
+  TOTAL REVENUE, FY2025 -- aggregate, not cell-level
+    STL+ETS      WAPE   4.2%
+    SARIMA       WAPE   6.2%
+    Theta        WAPE   6.8%
+
+  written: out/baseline_results.csv

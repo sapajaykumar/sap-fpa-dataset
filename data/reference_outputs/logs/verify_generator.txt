@@ -1,0 +1,8 @@
+dim_company_code                   3 rows x  4 cols
+dim_cost_center                   36 rows x  6 cols
+dim_cost_center_group             12 rows x  3 cols
+dim_profit_center                 12 rows x  3 cols
+dim_gl_account                    19 rows x  6 cols
+acdoca_actuals               159,934 rows x 19 cols
+plan_versions                 22,656 rows x 11 cols
+acdoca_universal_journal     159,934 rows x 19 cols  (view)

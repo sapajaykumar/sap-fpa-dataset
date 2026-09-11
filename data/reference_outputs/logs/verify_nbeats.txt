@@ -1,0 +1,32 @@
+  series 236  |  training windows 3,068  (lookback 12, horizon 12)
+  device cuda
+
+============================================================================
+  DEEP LEARNING vs BASELINES  (3 seeds, mean +- sd)
+============================================================================
+  model                           params      MASE      sd     WAPE
+  ------------------------------------------------------------------------
+  NBEATS-G (generic)             226,560     0.964   0.003   15.6%
+  GlobalMLP (+embeddings)         22,964     0.980   0.004   15.8%
+  NBEATS-I (interpretable)       218,112     1.062   0.006   16.1%
+  ------------------------------------------------------------------------
+  Rolling forecast (v2)               --     0.960      --   14.6%  [not ranked: sees FY2025]
+  LightGBM (global)                   --     1.034      --   16.6%
+  Theta                               --     1.054      --   19.2%
+  Budget (v1)  [human]                --     1.107      --   16.8%
+  SARIMA                              --     1.125      --   17.3%
+  ETS (Holt-Winters)                  --     1.127      --   19.7%
+  Seasonal naive                      --     1.133      --   17.2%
+  STL+ETS                             --     1.223      --   20.3%
+  Naive                               --     2.720      --   36.5%
+============================================================================
+
+  MASE BY ACCOUNT CATEGORY -- the hypothesis worth testing
+              NBEATS-G (generic)  NBEATS-I (interpretable)  GlobalMLP (+embeddings)
+COGS                       0.987                     1.004                    0.990
+DEPRECIATION               0.933                     0.939                    0.963
+OPEX                       0.966                     0.960                    0.963
+PERSONNEL                  0.943                     1.218                    0.950
+REVENUE                    1.017                     1.013                    1.055
+
+  (does a global model help most on the sparse, spiky cells?)
