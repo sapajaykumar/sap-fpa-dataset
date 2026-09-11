@@ -207,6 +207,7 @@ def make_nbeats_objective(mat, meta):
     def objective(vec):
         cfg = decode(vec, SPACE_NBEATS)
         torch.manual_seed(0)
+        np.random.seed(0)        # fix minibatch order: identical configs must score identically
         model = NB.NBeats("generic", width=cfg["width"], blocks=cfg["blocks"]).to(dev)
         opt = torch.optim.Adam(model.parameters(), lr=cfg["learning_rate"],
                                weight_decay=cfg["weight_decay"])
