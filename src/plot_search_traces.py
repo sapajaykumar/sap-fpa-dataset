@@ -65,13 +65,18 @@ def plot(traces: dict[str, np.ndarray], path: pathlib.Path) -> None:
     import matplotlib.pyplot as plt
 
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.8))
-    styles = {"Random": ("0.35", "--"), "GA": ("tab:blue", "-"), "PSO": ("tab:orange", "-")}
+    # Drawn widest-first so coinciding traces stay visible: all three optimisers
+    # share their first POP draws, and some never leave them.
+    styles = {"PSO": ("tab:orange", "-", 3.2, 1), "GA": ("tab:blue", "-", 2.0, 2),
+              "Random": ("0.15", "--", 1.3, 3)}
     for ax, fam in zip(axes, FAMILIES):
-        ax.axvspan(0.5, POP + 0.5, color="0.9", zorder=0, label="initial population")
+        ax.axvspan(0.5, POP + 0.5, color="0.9", zorder=0,
+                   label=f"shared initial draws (first {POP})")
         for opt, label in OPTIMISERS:
             bsf = np.minimum.accumulate(traces[f"{fam}_{opt}"])
-            c, ls = styles[opt]
-            ax.step(np.arange(1, len(bsf) + 1), bsf, where="post", color=c, ls=ls, label=label)
+            c, ls, lw, z = styles[opt]
+            ax.step(np.arange(1, len(bsf) + 1), bsf, where="post", color=c, ls=ls,
+                    lw=lw, zorder=z, label=label)
         ax.set_title(fam)
         ax.set_xlabel("evaluation")
         ax.set_ylabel("best-so-far inner score (lower is better)")
