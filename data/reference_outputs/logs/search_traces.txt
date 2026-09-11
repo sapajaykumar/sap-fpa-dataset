@@ -1,0 +1,10 @@
+  family               optimiser  evals   best  gain_over_random  best_at_eval best_within_initial_pop  best_of_initial_pop  improvement_after_init
+LightGBM Random search (control)     40 1.0550               NaN             5                     NaN               1.0550                     NaN
+LightGBM       Genetic algorithm     40 1.0499            0.0051            37                   False               1.0550                  0.0051
+LightGBM          Particle swarm     40 1.0550            0.0000             5                    True               1.0550                  0.0000
+ N-BEATS Random search (control)     40 0.1605               NaN            29                     NaN               0.1619                     NaN
+ N-BEATS       Genetic algorithm     40 0.1611           -0.0007            32                   False               0.1619                  0.0008
+ N-BEATS          Particle swarm     40 0.1603            0.0002            35                   False               0.1619                  0.0017
+
+  written: out/search_trace_summary.csv
+  written: out/fig4_search_traces.png

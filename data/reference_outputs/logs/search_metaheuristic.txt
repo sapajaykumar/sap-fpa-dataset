@@ -1,0 +1,111 @@
+==============================================================================
+  METAHEURISTIC HYPERPARAMETER SEARCH
+==============================================================================
+  inner split: fit t<24, score FY2024 (t=24..35)
+  FY2025 is not referenced by any objective function
+  budget: 40 evaluations per optimiser per family
+
+    LightGBM_Random         10/40  best 1.0550
+    LightGBM_Random         20/40  best 1.0550
+    LightGBM_Random         30/40  best 1.0550
+    LightGBM_Random         40/40  best 1.0550
+  LightGBM_Random        done    best 1.0550  (55s)
+    LightGBM_GA             10/40  best 1.0550
+    LightGBM_GA             20/40  best 1.0550
+    LightGBM_GA             30/40  best 1.0550
+    LightGBM_GA             40/40  best 1.0499
+  LightGBM_GA            done    best 1.0499  (77s)
+    LightGBM_PSO            10/40  best 1.0550
+    LightGBM_PSO            20/40  best 1.0550
+    LightGBM_PSO            30/40  best 1.0550
+    LightGBM_PSO            40/40  best 1.0550
+  LightGBM_PSO           done    best 1.0550  (72s)
+    N-BEATS_Random          10/40  best 0.1619
+    N-BEATS_Random          20/40  best 0.1619
+    N-BEATS_Random          30/40  best 0.1605
+    N-BEATS_Random          40/40  best 0.1605
+  N-BEATS_Random         done    best 0.1605  (414s)
+    N-BEATS_GA              10/40  best 0.1619
+    N-BEATS_GA              20/40  best 0.1613
+    N-BEATS_GA              30/40  best 0.1612
+    N-BEATS_GA              40/40  best 0.1611
+  N-BEATS_GA             done    best 0.1611  (302s)
+    N-BEATS_PSO             10/40  best 0.1619
+    N-BEATS_PSO             20/40  best 0.1608
+    N-BEATS_PSO             30/40  best 0.1608
+    N-BEATS_PSO             40/40  best 0.1603
+  N-BEATS_PSO            done    best 0.1603  (312s)
+
+==============================================================================
+  INNER-SPLIT SCORES (FY2024). Lower is better.
+==============================================================================
+  family      optimiser         best   evals  time (s)
+  --------------------------------------------------------------------------
+  LightGBM    Random          1.0550      40        55
+  LightGBM    GA              1.0499      40        77
+  LightGBM    PSO             1.0550      40        72
+  N-BEATS     Random          0.1605      40       414
+  N-BEATS     GA              0.1611      40       302
+  N-BEATS     PSO             0.1603      40       312
+
+  Did the population-based methods beat matched random search?
+    LightGBM   GA   vs Random: +0.0051  (better)
+    LightGBM   PSO  vs Random: +0.0000  (tie)
+    N-BEATS    GA   vs Random: -0.0007  (worse)
+    N-BEATS    PSO  vs Random: +0.0002  (better)
+
+  Best configurations found:
+    LightGBM_Random
+      max_lag              12
+      num_leaves           65
+      learning_rate        0.02164
+      n_estimators         636
+      min_child_samples    29
+      feature_fraction     0.91634
+      bagging_fraction     0.85013
+      lambda_l1            0.01776
+      lambda_l2            2.13324
+    LightGBM_GA
+      max_lag              12
+      num_leaves           62
+      learning_rate        0.01921
+      n_estimators         638
+      min_child_samples    29
+      feature_fraction     0.83386
+      bagging_fraction     0.79422
+      lambda_l1            0.42489
+      lambda_l2            0.14743
+    LightGBM_PSO
+      max_lag              12
+      num_leaves           65
+      learning_rate        0.02164
+      n_estimators         636
+      min_child_samples    29
+      feature_fraction     0.91634
+      bagging_fraction     0.85013
+      lambda_l1            0.01776
+      lambda_l2            2.13324
+    N-BEATS_Random
+      width                96
+      blocks               3
+      learning_rate        0.00420
+      batch_size           256
+      weight_decay         0.00008
+    N-BEATS_GA
+      width                96
+      blocks               3
+      learning_rate        0.00075
+      batch_size           512
+      weight_decay         0.00000
+    N-BEATS_PSO
+      width                96
+      blocks               4
+      learning_rate        0.00081
+      batch_size           512
+      weight_decay         0.00000
+
+  written: out/metaheuristic_results.json
+
+  Next: refit_tuned.py takes the winning configurations, refits on the
+  full 36-period span, and reports FY2025 test MASE. That is the only
+  point at which FY2025 is touched.

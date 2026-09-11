@@ -1,0 +1,7 @@
+family,optimiser,evals,best,gain_over_random,best_at_eval,best_within_initial_pop,best_of_initial_pop,improvement_after_init
+LightGBM,Random search (control),40,1.055,,5,,1.055,
+LightGBM,Genetic algorithm,40,1.0499,0.0051,37,False,1.055,0.0051
+LightGBM,Particle swarm,40,1.055,0.0,5,True,1.055,0.0
+N-BEATS,Random search (control),40,0.1605,,29,,0.1619,
+N-BEATS,Genetic algorithm,40,0.1611,-0.0007,32,False,0.1619,0.0008
+N-BEATS,Particle swarm,40,0.1603,0.0002,35,False,0.1619,0.0017

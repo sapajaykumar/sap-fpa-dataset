@@ -1,0 +1,23 @@
+============================================================================================================
+                                             ACCEPTANCE REPORT                                              
+============================================================================================================
+  [PASS] T1  FI/CO schema (BKPF/BSEG fields)             17/17 required fields present
+  [PASS] T2  >= 36 monthly periods                       48 regular fiscal periods (2022-2025)
+  [PASS] T2b Seasonality detectable in revenue           amplitude >= 0.45 in every one of 8 account-year combinations; peak month 12 on 400000
+  [PASS] I1  Every document balances (debit == credit)   79,967 documents checked, 0 unbalanced
+  [PASS] I2  Accruals reversed via STBLG                 689 accrual documents, 672 reversed, 0 unreversed, 0 dangling (excl. 17 raised in the final fiscal year)
+  [PASS] I3  Dimension referential integrity             0 orphans across KOSTL, HKONT, PRCTR, BUKRS
+  [PASS] I4  Document date <= posting date               0 documents dated after posting
+  [PASS] R1  Month-end posting concentration             34.1% of lines post in the last 3 days of the period (uniform would be ~10%)
+  [PASS] R2  Special periods 13-16 present               276 lines in periods [13, 14, 15, 16], present in 4/4 fiscal years
+  [PASS] C1  DMBTR level plausible for profile           median line 39,521 on a ~EUR 3bn entity (p95 1,590,007, max 38,555,867)
+  [PASS] C2  Within-account skew vs Schreyer             mean/median 1.87 vs Schreyer 1.87 (pooled skew is NOT a valid target -- see DATASET_DESIGN.md)
+  [PASS] C3  Account-level heterogeneity                 356x between largest and smallest account median (Schreyer: 1.0x -- the defect this generator corrects)
+  [PASS] P1  Budget variance is non-trivial and bounded  median |actual-vs-budget| = 14.3% of actual, across 11,328 cells
+  [PASS] P2  Rolling forecast beats budget               forecast 12.3% vs budget 14.3% median abs error, both over actual
+  [PASS] P3  Gross margin on target                      44.2% vs 45.0% target
+  [PASS] P4  Operating margin plausible                  4.3% (a generator that quietly emits a loss-making entity is not a credible FP&A testbed)
+============================================================================================================
+  16/16 checks passed
+  actuals: 159,934 lines | plan: 22,656 rows
+============================================================================================================

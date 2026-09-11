@@ -1,0 +1,25 @@
+==============================================================================
+  TUNED MODELS ON FY2025
+==============================================================================
+  Configurations selected on FY2024; this is the first use of FY2025.
+
+  LightGBM: best inner score from GA (1.0499)
+  N-BEATS: best inner score from PSO (0.1603)
+
+==============================================================================
+  TUNED vs UNTUNED, FY2025 cell-level MASE
+==============================================================================
+  model                              MASE      sd   selected by
+  --------------------------------------------------------------------------
+  LightGBM (tuned)                  1.034      --            GA
+  N-BEATS generic (tuned)           0.963   0.004           PSO
+  --------------------------------------------------------------------------
+  untuned reference:
+  N-BEATS generic (default)         0.964   0.003
+  LightGBM (default)                1.034      --
+==============================================================================
+
+  written: out/tuned_results.csv
+
+  Read the tuned N-BEATS gain against its own seed s.d. before
+  claiming an improvement.
